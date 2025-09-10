@@ -43,6 +43,31 @@ const time_t time_xmas_2025 = 1766649600;
 void setup() {
   Serial.begin(115200);
 
+  // Setup dot matrix display panel
+  ProtomatterStatus status = matrix.begin();
+  Serial.print("Initializing dot matrix panel. Status: ");
+  Serial.println((int)status);
+  if (status != PROTOMATTER_OK) {
+    while (true)
+      ;
+  }
+  matrix.setRotation(2);
+  matrix.setTextSize(1);
+
+  matrix.setCursor(5, 0);
+  matrix.setTextColor(color444(15, 0, 0), 0); // Red on black
+  matrix.print("Christmas");
+
+  matrix.setCursor(5, 8);
+  matrix.setTextColor(color444(0, 15, 0), 0); // Green on black
+  matrix.print("Countdown");
+
+  matrix.setCursor(32, 16);
+  matrix.setTextColor(color444(15, 15, 15), 0); // White on black
+  matrix.print("days");
+
+  matrix.show();
+
   // Connect to WiFi
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
@@ -76,21 +101,6 @@ void setup() {
   timerAlarm(timer, /* alarm_value = */
              1000000, /* autoreload = */ true,
              /* reload_count = */ 0);
-
-  matrix.setRotation(2);
-  matrix.setTextSize(1);
-
-  matrix.setCursor(5, 0);
-  matrix.setTextColor(color444(15, 0, 0), 0); // Red on black
-  matrix.print("Christmas");
-
-  matrix.setCursor(5, 8);
-  matrix.setTextColor(color444(0, 15, 0), 0); // Green on black
-  matrix.print("Countdown");
-
-  matrix.setCursor(29, 16);
-  matrix.setTextColor(color444(15, 15, 15), 0); // White on black
-  matrix.print("000 days");
 }
 
 void loop() {
@@ -137,14 +147,14 @@ void loop() {
 
   if (days != current_days) {
     current_days = days;
-    matrix.setCursor(5, 16);
+    matrix.setCursor(8, 16);
     matrix.setTextColor(color444(15, 15, 15), 0);
     matrix.printf("%03d days", days);
   }
 
   static bool show_colon = true;
   show_colon = !show_colon;
-  matrix.setCursor(5, 24);
+  matrix.setCursor(8, 24);
   matrix.setTextColor(color444(15, 15, 15), 0);
   matrix.printf(show_colon ? "%02d:%02d:%02d" : "%02d %02d %02d", hours,
                 minutes, seconds);
