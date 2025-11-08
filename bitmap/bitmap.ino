@@ -99,17 +99,27 @@ void setup() {
              /* reload_count = */ 0);
 }
 
+constexpr uint8_t glitter_count = 15;
+const uint16_t glitter_x[glitter_count] = {3,  4,  27, 28, 32, 2,  30, 28,
+                                           30, 30, 34, 36, 32, 37, 33};
+const uint16_t glitter_y[glitter_count] = {14, 17, 16, 11, 13, 23, 19, 22,
+                                           24, 27, 17, 30, 28, 25, 23};
+
 void loop() {
   if (xSemaphoreTake(timerSemaphore, 0) != pdTRUE) {
     return;
   }
 
-  static bool show = true;
   static uint16_t white = matrix.color565(255, 255, 255);
   static uint16_t black = matrix.color565(0, 0, 0);
 
-  matrix.drawPixel(32, 16, show ? white : black);
-  show = !show;
+  for (int i = 0; i < glitter_count; i++) {
+    uint16_t x = glitter_x[i];
+    uint16_t y = glitter_y[i];
+    bool show = random(100) >= 50;
+    // bool show = true;
+    matrix.drawPixel(x, y, show ? white : black);
+  }
 
   matrix.show();
 }
