@@ -12,13 +12,12 @@ uint8_t clockPin = 16;
 uint8_t latchPin = 4;
 uint8_t oePin = 15;
 
-Adafruit_Protomatter
-    matrix(64,          // Width of matrix (or matrix chain) in pixels
-           4,           // Bit depth, 1-6
-           1, rgbPins,  // # of matrix chains, array of 6 RGB pins for each
-           4, addrPins, // # of address pins (height is inferred), array of pins
-           clockPin, latchPin, oePin, // Other matrix control pins
-           false); // No double-buffering here (see "doublebuffer" example)
+Adafruit_Protomatter matrix(/* width= */ 128,
+                            /* depth= */ 4,
+                            /* matrix_chains= */ 1, rgbPins,
+                            /* addr_count= */ 4, addrPins, clockPin, latchPin,
+                            oePin,
+                            /* double_buffer= */ false, /* tile= */ -2);
 
 /**
  * WiFi setup
@@ -52,17 +51,17 @@ void setup() {
       ;
   }
   matrix.setRotation(2);
-  matrix.setTextSize(1);
+  matrix.setTextSize(2);
 
-  matrix.setCursor(5, 0);
+  matrix.setCursor(10, 0);
   matrix.setTextColor(color444(15, 0, 0), 0); // Red on black
   matrix.print("Christmas");
 
-  matrix.setCursor(5, 8);
+  matrix.setCursor(10, 16);
   matrix.setTextColor(color444(0, 15, 0), 0); // Green on black
   matrix.print("Countdown");
 
-  matrix.setCursor(32, 16);
+  matrix.setCursor(64, 32);
   matrix.setTextColor(color444(15, 15, 15), 0); // White on black
   matrix.print("days");
 
@@ -147,14 +146,14 @@ void loop() {
 
   if (days != current_days) {
     current_days = days;
-    matrix.setCursor(8, 16);
+    matrix.setCursor(16, 32);
     matrix.setTextColor(color444(15, 15, 15), 0);
     matrix.printf("%03d days", days);
   }
 
   static bool show_colon = true;
   show_colon = !show_colon;
-  matrix.setCursor(8, 24);
+  matrix.setCursor(16, 48);
   matrix.setTextColor(color444(15, 15, 15), 0);
   matrix.printf(show_colon ? "%02d:%02d:%02d" : "%02d %02d %02d", hours,
                 minutes, seconds);
