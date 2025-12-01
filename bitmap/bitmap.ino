@@ -46,13 +46,8 @@ uint8_t clockPin = 16;
 uint8_t latchPin = 4;
 uint8_t oePin = 15;
 
-Adafruit_Protomatter
-    matrix(64,          // Width of matrix (or matrix chain) in pixels
-           5,           // Bit depth, 1-6
-           1, rgbPins,  // # of matrix chains, array of 6 RGB pins for each
-           4, addrPins, // # of address pins (height is inferred), array of pins
-           clockPin, latchPin, oePin, // Other matrix control pins
-           false); // No double-buffering here (see "doublebuffer" example)
+Adafruit_Protomatter matrix(128, 2, 1, rgbPins, 4, addrPins, clockPin, latchPin,
+                            oePin, false, -2);
 
 /**
  * Timer setup
@@ -71,7 +66,7 @@ void setup() {
     while (true)
       ;
   }
-  matrix.setRotation(0);
+  matrix.setRotation(2);
 
   matrix.drawRGBBitmap(0, 0, tree, 32, 32);
   matrix.setTextSize(1);
