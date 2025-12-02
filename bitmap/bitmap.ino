@@ -40,7 +40,7 @@ void setup() {
   }
   matrix.setRotation(2);
 
-  matrix.drawRGBBitmap(0, 0, tree, 47, 64);
+  matrix.drawRGBBitmap(1, 5, tree, 41, 59);
   matrix.drawRGBBitmap(78, 14, snowman, 50, 50);
 
   matrix.setTextSize(1);
