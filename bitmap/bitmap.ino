@@ -171,18 +171,33 @@ void setup() {
   matrix.setRotation(2);
 
   matrix.drawRGBBitmap(0, 0, tree, 47, 64);
+  matrix.drawRGBBitmap(81, 0, tree, 47, 64);
+
   matrix.setTextSize(1);
-  matrix.setCursor(68, 6);
+  matrix.setCursor(49, 2);
   matrix.setTextColor(matrix.color565(255, 0, 0));
   matrix.print("MERRY");
 
-  matrix.setCursor(74, 26);
+  matrix.setCursor(37, 12);
   matrix.setTextColor(matrix.color565(0, 255, 0));
-  matrix.print("XMAS");
+  matrix.print("CHRISTMAS");
 
-  matrix.setCursor(80, 46);
+  matrix.setCursor(61, 22);
   matrix.setTextColor(matrix.color565(255, 255, 255));
-  matrix.print("!!!");
+  matrix.print("&");
+
+  matrix.setTextSize(1);
+  matrix.setCursor(49, 32);
+  matrix.setTextColor(matrix.color565(255, 0, 0));
+  matrix.print("HAPPY");
+
+  matrix.setCursor(55, 42);
+  matrix.setTextColor(matrix.color565(255, 255, 0));
+  matrix.print("NEW");
+
+  matrix.setCursor(52, 52);
+  matrix.setTextColor(matrix.color565(0, 0, 255));
+  matrix.print("YEAR");
 
   matrix.show();
 
@@ -203,6 +218,8 @@ const uint16_t glitter_y[glitter_count] = {14, 17, 16, 11, 13, 23, 19, 22,
                                            24, 27, 17, 30, 28, 25, 23};
 
 void loop() {
+  return;
+
   if (xSemaphoreTake(timerSemaphore, 0) != pdTRUE) {
     return;
   }
