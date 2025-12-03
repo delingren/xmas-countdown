@@ -23,9 +23,9 @@ hw_timer_t *timer = NULL;
 volatile SemaphoreHandle_t timerSemaphore;
 void ARDUINO_ISR_ATTR onTimer() { xSemaphoreGiveFromISR(timerSemaphore, NULL); }
 
-constexpr int snowflake_count = 4;
+constexpr int snowflake_count = 5;
 const int snowflake_params[snowflake_count][3] = {
-    {1, 0, 26}, {120, 0, 29}, {98, 0, 7}, {41, 20, 42}};
+    {1, 0, 32}, {42, 20, 64}, {78, 42, 64}, {98, 0, 8}, {120, 0, 31}};
 int snowflake_y[snowflake_count];
 
 void setup() {
@@ -40,7 +40,7 @@ void setup() {
   }
   matrix.setRotation(2);
 
-  matrix.drawRGBBitmap(1, 5, tree, 41, 59);
+  matrix.drawRGBBitmap(0, 5, tree, 41, 59);
   matrix.drawRGBBitmap(78, 14, snowman, 50, 50);
 
   matrix.setTextSize(1);
@@ -91,13 +91,8 @@ void loop() {
     return;
   }
 
-  constexpr int y_min = 0;
-  constexpr int y_max = 32;
-
   static uint16_t white = matrix.color565(255, 255, 255);
   static uint16_t black = matrix.color565(0, 0, 0);
-
-  static int y = y_min;
 
   for (int i = 0; i < snowflake_count; i++) {
     if (snowflake_y[i] >= snowflake_params[i][1] &&
