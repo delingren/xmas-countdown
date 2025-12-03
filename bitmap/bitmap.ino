@@ -25,7 +25,7 @@ void ARDUINO_ISR_ATTR onTimer() { xSemaphoreGiveFromISR(timerSemaphore, NULL); }
 
 constexpr int snowflake_count = 5;
 const int snowflake_params[snowflake_count][3] = {
-    {1, 0, 32}, {42, 20, 64}, {78, 42, 64}, {98, 0, 8}, {120, 0, 31}};
+    {1, 0, 36}, {42, 20, 64}, {78, 42, 64}, {98, 0, 14}, {120, 0, 37}};
 int snowflake_y[snowflake_count];
 
 void setup() {
@@ -95,17 +95,18 @@ void loop() {
   static uint16_t black = matrix.color565(0, 0, 0);
 
   for (int i = 0; i < snowflake_count; i++) {
-    if (snowflake_y[i] >= snowflake_params[i][1] &&
-        snowflake_y[i] < snowflake_params[i][2]) {
-      matrix.drawBitmap(snowflake_params[i][0], snowflake_y[i], snowflake, 6, 7,
+    int max_y = snowflake_params[i][2];
+    int h = min(max_y - snowflake_y[i], 7);
+    if (snowflake_y[i] >= snowflake_params[i][1] && snowflake_y[i] < max_y) {
+      matrix.drawBitmap(snowflake_params[i][0], snowflake_y[i], snowflake, 6, h,
                         black);
     }
-    if (++snowflake_y[i] > snowflake_params[i][2] + 3) {
+    if (++snowflake_y[i] > max_y + 3) {
       snowflake_y[i] = snowflake_params[i][1];
     }
-    if (snowflake_y[i] >= snowflake_params[i][1] &&
-        snowflake_y[i] < snowflake_params[i][2]) {
-      matrix.drawBitmap(snowflake_params[i][0], snowflake_y[i], snowflake, 6, 7,
+    h = min(max_y - snowflake_y[i], 7);
+    if (snowflake_y[i] >= snowflake_params[i][1] && snowflake_y[i] < max_y) {
+      matrix.drawBitmap(snowflake_params[i][0], snowflake_y[i], snowflake, 6, h,
                         white);
     }
   }
