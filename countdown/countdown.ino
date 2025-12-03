@@ -55,15 +55,15 @@ void setup() {
 
   matrix.setCursor(10, 0);
   matrix.setTextColor(color444(15, 0, 0), 0); // Red on black
-  matrix.print("Christmas");
+  matrix.print("CHRISTMAS");
 
   matrix.setCursor(10, 16);
   matrix.setTextColor(color444(0, 15, 0), 0); // Green on black
-  matrix.print("Countdown");
+  matrix.print("COUTNDOWN");
 
   matrix.setCursor(64, 32);
   matrix.setTextColor(color444(15, 15, 15), 0); // White on black
-  matrix.print("days");
+  matrix.print("DAYS");
 
   matrix.show();
 
