@@ -49,6 +49,7 @@ void setup() {
       ;
   }
   matrix.setRotation(2);
+  drawBackground();
 
   // Connect to WiFi
   WiFi.mode(WIFI_STA);
@@ -90,9 +91,9 @@ void setup() {
   long difference = (long)difftime(time_xmas_2025, time_now);
   if (difference < 0) {
     countdown_finished = true;
-    setupMerryChristmas();
+    drawChristmasText();
   } else {
-    setupCountDown();
+    drawCountdownText();
   }
 }
 
@@ -102,8 +103,9 @@ void loop() {
     return;
   }
 
+  animateSnowFlakes();
+
   if (countdown_finished) {
-    updateMerryChristmas();
     return;
   }
 
@@ -112,68 +114,12 @@ void loop() {
 
   if (difference < 0) {
     countdown_finished = true;
-    setupMerryChristmas();
+    // Redraw the background to clear the countdown text.
+    drawBackground();
+    drawChristmasText();
   } else {
-    updateCountDown(difference);
+    animateCountdown(difference);
   }
-}
-
-void setupCountDown() {
-  matrix.fillScreen(0);
-  matrix.setTextSize(2);
-
-  matrix.setCursor(10, 0);
-  matrix.setTextColor(matrix.color565(255, 0, 0), 0);
-  matrix.print("CHRISTMAS");
-
-  matrix.setCursor(10, 16);
-  matrix.setTextColor(matrix.color565(0, 255, 0), 0);
-  matrix.print("COUTNDOWN");
-
-  matrix.setCursor(64, 32);
-  matrix.setTextColor(matrix.color565(255, 255, 255), 0);
-  matrix.print("DAYS");
-
-  matrix.show();
-}
-
-void updateCountDown(long difference) {
-  // Sync with NTP once a day to calibrate our clock.
-  const long NTP_SYNC_INTERVAL = 24 * 60 * 60 * 1000; // 24 hours
-  static long lastSync = 0;
-  long millisNow = millis();
-  if (millisNow - lastSync > NTP_SYNC_INTERVAL) {
-    lastSync = millisNow;
-    configTime(0, 0, ntpServer);
-  }
-
-  sntp_sync_status_t syncStatus = sntp_get_sync_status();
-  if (syncStatus == SNTP_SYNC_STATUS_COMPLETED) {
-    // TODO: display a notification on the panel
-    Serial.println("Time synchronized.");
-  }
-
-  static int current_days = -1;
-
-  int seconds = difference % 60;
-  int minutes = (difference / 60) % 60;
-  int hours = (difference / 3600) % 24;
-  int days = difference / (3600 * 24);
-
-  if (days != current_days) {
-    current_days = days;
-    matrix.setCursor(16, 32);
-    matrix.setTextColor(matrix.color565(255, 255, 255), 0);
-    matrix.printf("%03d", days);
-  }
-
-  static bool show_colon = true;
-  show_colon = !show_colon;
-  matrix.setCursor(16, 48);
-  matrix.setTextColor(matrix.color565(255, 255, 255), 0);
-  matrix.printf(show_colon ? "%02d:%02d:%02d" : "%02d %02d %02d", hours,
-                minutes, seconds);
-  matrix.show();
 }
 
 #include "../assets/snowflake.c"
@@ -185,11 +131,31 @@ const int snowflake_params[snowflake_count][3] = {
     {1, 0, 36}, {42, 20, 64}, {78, 42, 64}, {98, 0, 14}, {120, 0, 37}};
 int snowflake_y[snowflake_count];
 
-void setupMerryChristmas() {
+void drawBackground() {
   matrix.fillScreen(0);
   matrix.drawRGBBitmap(0, 5, tree, 41, 59);
   matrix.drawRGBBitmap(78, 14, snowman, 50, 50);
+}
 
+void drawCountdownText() {
+  matrix.setTextSize(1);
+
+  matrix.setCursor(66, 10);
+  matrix.setTextColor(matrix.color565(255, 255, 255), 0);
+  matrix.print("DAYS");
+
+  matrix.setCursor(52, 36);
+  matrix.setTextColor(matrix.color565(0, 255, 0));
+  matrix.print("'TIL");
+
+  matrix.setCursor(52, 46);
+  matrix.setTextColor(matrix.color565(255, 0, 0), 0);
+  matrix.print("XMAS");
+
+  matrix.show();
+}
+
+void drawChristmasText() {
   matrix.setTextSize(1);
   matrix.setCursor(49, 2);
   matrix.setTextColor(matrix.color565(255, 0, 0));
@@ -219,7 +185,7 @@ void setupMerryChristmas() {
   matrix.show();
 }
 
-void updateMerryChristmas() {
+void animateSnowFlakes() {
   static uint16_t white = matrix.color565(255, 255, 255);
   static uint16_t black = matrix.color565(0, 0, 0);
 
@@ -240,5 +206,46 @@ void updateMerryChristmas() {
     }
   }
 
+  matrix.show();
+}
+
+void animateCountdown(long difference) {
+  // Sync with NTP once a day to calibrate our clock.
+  const long NTP_SYNC_INTERVAL = 24 * 60 * 60 * 1000; // 24 hours
+  static long lastSync = 0;
+  long millisNow = millis();
+  if (millisNow - lastSync > NTP_SYNC_INTERVAL) {
+    lastSync = millisNow;
+    configTime(0, 0, ntpServer);
+  }
+
+  sntp_sync_status_t syncStatus = sntp_get_sync_status();
+  if (syncStatus == SNTP_SYNC_STATUS_COMPLETED) {
+    // TODO: display a notification on the panel
+    Serial.println("Time synchronized.");
+  }
+
+  static int current_days = -1;
+
+  int seconds = difference % 60;
+  int minutes = (difference / 60) % 60;
+  int hours = (difference / 3600) % 24;
+  int days = difference / (3600 * 24);
+
+  if (days != current_days) {
+    current_days = days;
+    matrix.setTextSize(1);
+    matrix.setCursor(38, 2);
+    matrix.setTextColor(matrix.color565(255, 255, 255), 0);
+    matrix.printf("%02d", days);
+  }
+
+  static bool show_colon = true;
+  show_colon = !show_colon;
+  matrix.setTextSize(1);
+  matrix.setCursor(40, 24);
+  matrix.setTextColor(matrix.color565(255, 255, 255), 0);
+  matrix.printf(show_colon ? "%02d:%02d:%02d" : "%02d %02d %02d", hours,
+                minutes, seconds);
   matrix.show();
 }
