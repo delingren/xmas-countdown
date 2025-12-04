@@ -135,22 +135,27 @@ void drawBackground() {
   matrix.fillScreen(0);
   matrix.drawRGBBitmap(0, 5, tree, 41, 59);
   matrix.drawRGBBitmap(78, 14, snowman, 50, 50);
+  matrix.show();
 }
 
 void drawCountdownText() {
   matrix.setTextSize(1);
 
-  matrix.setCursor(66, 10);
+  matrix.setCursor(61, 2);
   matrix.setTextColor(matrix.color565(255, 255, 255), 0);
   matrix.print("DAYS");
 
-  matrix.setCursor(52, 36);
+  matrix.setCursor(52, 22);
   matrix.setTextColor(matrix.color565(0, 255, 0));
   matrix.print("'TIL");
 
-  matrix.setCursor(52, 46);
+  matrix.setCursor(52, 32);
   matrix.setTextColor(matrix.color565(255, 0, 0), 0);
   matrix.print("XMAS");
+
+  matrix.setCursor(52, 42);
+  matrix.setTextColor(matrix.color565(255, 255, 0), 0);
+  matrix.print("2025");
 
   matrix.show();
 }
@@ -235,7 +240,7 @@ void animateCountdown(long difference) {
   if (days != current_days) {
     current_days = days;
     matrix.setTextSize(1);
-    matrix.setCursor(38, 2);
+    matrix.setCursor(43, 2);
     matrix.setTextColor(matrix.color565(255, 255, 255), 0);
     matrix.printf("%02d", days);
   }
@@ -243,8 +248,8 @@ void animateCountdown(long difference) {
   static bool show_colon = true;
   show_colon = !show_colon;
   matrix.setTextSize(1);
-  matrix.setCursor(40, 24);
   matrix.setTextColor(matrix.color565(255, 255, 255), 0);
+  matrix.setCursor(40, 12);
   matrix.printf(show_colon ? "%02d:%02d:%02d" : "%02d %02d %02d", hours,
                 minutes, seconds);
   matrix.show();
