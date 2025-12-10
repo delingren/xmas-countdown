@@ -18,3 +18,7 @@ const char *password = "PASSWORD";
 There are many ways to provision WiFi on a ESP32. But I chose to hard code for simplicity.
 
 For the tree image, I composed a 32x32 image in GIMP, and converted it to C code using this [neat little tool](https://marlinfw.org/tools/rgb565/converter.html). I don't have a single artistic bone in me. If you come up with a better graphic, please share with me!
+
+These dot matrix displays can be daisy chained. So after finishing the first version, I got 4 displays and tiled them into a bigger one! Check out the code in [2x2](./2x2/) folder. With the extra real estate, I am able to display more graphics!
+
+![2x2](./IMG_1891.jpeg)
