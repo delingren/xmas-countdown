@@ -48,7 +48,7 @@ void setup() {
     while (true)
       ;
   }
-  matrix.setRotation(2);
+  matrix.setRotation(0);
   drawBackground();
 
   // Connect to WiFi
@@ -184,7 +184,7 @@ void drawChristmasText() {
   matrix.print("NEW");
 
   matrix.setCursor(52, 52);
-  matrix.setTextColor(matrix.color565(0, 0, 255));
+  matrix.setTextColor(matrix.color565(255, 255, 255));
   matrix.print("YEAR");
 
   matrix.show();
