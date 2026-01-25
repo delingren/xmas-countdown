@@ -1,19 +1,44 @@
-#include <Adafruit_Protomatter.h>
+#include <Arduino.h>
 #include <WiFi.h>
 #include <sntp.h>
 #include <time.h>
 
+#include <ESP32-HUB75-VirtualMatrixPanel_T.hpp>
+
 /**
  * Dot matrix panel setup
  */
-uint8_t rgbPins[] = {25, 26, 27, 14, 12, 13};
-uint8_t addrPins[] = {23, 19, 5, 17};
-uint8_t clockPin = 16;
-uint8_t latchPin = 4;
-uint8_t oePin = 15;
 
-Adafruit_Protomatter matrix(128, 3, 1, rgbPins, 4, addrPins, clockPin, latchPin,
-                            oePin, false, -2);
+#define R1 25
+#define G1 26
+#define B1 27
+#define R2 14
+#define G2 12
+#define B2 13
+
+#define ADDR_A 23
+#define ADDR_B 19
+#define ADDR_C 5
+#define ADDR_D 17
+#define ADDR_E -1
+
+#define CLK 16
+#define LAT 4
+#define OE 15
+
+HUB75_I2S_CFG mxconfig(/* w= */ 64, /*h= */ 32, /* chain= */ 4,
+                       {R1, G1, B1, R2, G2, B2, ADDR_A, ADDR_B, ADDR_C, ADDR_D,
+                        ADDR_E, LAT, OE, CLK},
+                       HUB75_I2S_CFG::SHIFTREG, HUB75_I2S_CFG::TYPE138,
+                       /* doublebuffer= */ false,
+                       /* i2sspeed= */ HUB75_I2S_CFG::HZ_8M,
+                       /* latblank= */ 2, /* clockphase= */ false,
+                       /* min_refresh_rate= */ 60,
+                       /* color_depth_bits= */ 8);
+
+MatrixPanel_I2S_DMA physicalDisplay(mxconfig);
+
+VirtualMatrixPanel_T<CHAIN_TOP_RIGHT_DOWN> matrix(2, 2, 64, 32);
 
 /**
  * WiFi setup
@@ -23,13 +48,13 @@ Adafruit_Protomatter matrix(128, 3, 1, rgbPins, 4, addrPins, clockPin, latchPin,
 /**
  * NTP server setup
  */
-const char *ntpServer = "north-america.pool.ntp.org";
+const char* ntpServer = "north-america.pool.ntp.org";
 // Why do we not care about the timezone here?
 
 /**
  * Timer setup
  */
-hw_timer_t *timer = NULL;
+hw_timer_t* timer = NULL;
 volatile SemaphoreHandle_t timerSemaphore;
 void ARDUINO_ISR_ATTR onTimer() { xSemaphoreGiveFromISR(timerSemaphore, NULL); }
 
@@ -41,14 +66,9 @@ void setup() {
   Serial.begin(115200);
 
   // Setup dot matrix display panel
-  ProtomatterStatus status = matrix.begin();
-  Serial.print("Initializing dot matrix panel. Status: ");
-  Serial.println((int)status);
-  if (status != PROTOMATTER_OK) {
-    while (true)
-      ;
-  }
-  matrix.setRotation(2);
+  physicalDisplay.begin();
+  matrix.setDisplay(physicalDisplay);
+
   drawBackground();
 
   // Connect to WiFi
@@ -96,7 +116,6 @@ void setup() {
     drawCountdownText();
   }
 }
-
 void loop() {
   // We only update once per second.
   if (xSemaphoreTake(timerSemaphore, 0) != pdTRUE) {
@@ -135,7 +154,6 @@ void drawBackground() {
   matrix.fillScreen(0);
   matrix.drawRGBBitmap(0, 5, tree, 41, 59);
   matrix.drawRGBBitmap(78, 14, snowman, 50, 50);
-  matrix.show();
 }
 
 void drawCountdownText() {
@@ -156,8 +174,6 @@ void drawCountdownText() {
   matrix.setCursor(52, 42);
   matrix.setTextColor(matrix.color565(255, 255, 0), 0);
   matrix.print("2025");
-
-  matrix.show();
 }
 
 void drawChristmasText() {
@@ -186,8 +202,6 @@ void drawChristmasText() {
   matrix.setCursor(52, 52);
   matrix.setTextColor(matrix.color565(0, 0, 255));
   matrix.print("YEAR");
-
-  matrix.show();
 }
 
 void animateSnowFlakes() {
@@ -210,13 +224,11 @@ void animateSnowFlakes() {
                         white);
     }
   }
-
-  matrix.show();
 }
 
 void animateCountdown(long difference) {
   // Sync with NTP once a day to calibrate our clock.
-  const long NTP_SYNC_INTERVAL = 24 * 60 * 60 * 1000; // 24 hours
+  const long NTP_SYNC_INTERVAL = 24 * 60 * 60 * 1000;  // 24 hours
   static long lastSync = 0;
   long millisNow = millis();
   if (millisNow - lastSync > NTP_SYNC_INTERVAL) {
@@ -252,5 +264,4 @@ void animateCountdown(long difference) {
   matrix.setCursor(40, 12);
   matrix.printf(show_colon ? "%02d:%02d:%02d" : "%02d %02d %02d", hours,
                 minutes, seconds);
-  matrix.show();
 }
